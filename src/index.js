@@ -125,20 +125,138 @@ const PlusButtom=styled.button`
     &:hover{
         cursor: pointer;
         color:blue;
+        border-radius:5px;
+    
     }
     `;
 
+// ------------------機能-------------------
 
-// function TodoList(props){
 
-// }
+// --------------------------React--------------
+
+const todos=[];
+
+
+
+
+
+
+function TodoItem(props){
+    return(
+        <Todo>
+            <TodoText key={props.todo.id}>
+                {props.todo.title}
+            </TodoText>
+            <PlusButtom reverse onClick={()=>
+            props.deleteTodo(props.todo)} >✖</PlusButtom>
+        </Todo>
+        
+    )
+}
+
+function TodoList(props){
+    const todos=props.todos.map(todo=>{
+        return(
+            <TodoItem
+            key={todo.id}
+            todo={todo}
+            deleteTodo={props.deleteTodo}
+            />
+        );
+    });
+    return(
+        <span>{todos}</span>
+    );
+};
+
+function Todoform(props){
+    return(
+    <Form>
+        <FormTextarea onSubmit={props.addTodo} action="">
+            <input type="text" name="" id="" cols="38" rows="3"
+            value={props.item} onChange={props.updateItem} ></input>
+        <PlusButtom type='submit' reverse>put</PlusButtom>
+            {/* <input type="submit" value="Add"/> */}
+        </FormTextarea>
+        <PlusButtom reverse big>cancele</PlusButtom>
+    </Form>
+        
+    )
+}
+
+function WorkTitle(){
+    return(
+    <ColumnTitleDiv>
+        <ColumnTitle>① 数学</ColumnTitle>
+        <PlusButtom>+</PlusButtom>
+        <PlusButtom>・・・</PlusButtom>
+    </ColumnTitleDiv>
+
+    )
+}
+
+function getUniqueID(){
+    return new Date().getTime().toString(36)
+}
 
 class App extends React.Component{
     constructor(){
         super();
         this.state={
-        }
+            todos:todos,
+            item:''
+        };
+        this.deleteTodo=this.deleteTodo.bind(this);
+        this.updateItem=this.updateItem.bind(this);
+        this.addTodo=this.addTodo.bind(this);
+
     }
+
+    // stateをいじるときは、コンポーネントの中に書く
+    deleteTodo(todo){
+        if(!window.confirm('are you ready?')){
+            return;
+        } 
+        const todos=this.state.todos.slice();
+        const pos=this.state.todos.indexOf(todo);
+    
+        todos.splice(pos,1);
+        this.setState({
+            todos:todos
+        })}
+
+    updateItem(e){
+        this.setState({
+            item: e.target.value
+        });
+    }
+
+    addTodo(e){
+        e.preventDefault();
+        // 提出した後も画面が遷移しない↑
+        if(this.state.item.trim()===''){
+            return;
+        }
+
+        const item={
+            title:this.state.item,
+            id:getUniqueID()
+        };
+        const todos=this.state.todos.slice();
+        // todosをコピーしている↑
+        
+        
+        todos.push(item);
+        // todosにitemを追加している↑
+        this.setState({
+            todos:todos,
+            item:''
+        });
+        // SetstateでUIを更新している。
+        // itemの値は、inputの初期値なので消している↑
+    }
+
     render(){
         return(
         <div id="wrap">
@@ -150,32 +268,24 @@ class App extends React.Component{
             
                 <ProjectDiv>
                     <ProjectText>
-                    Project Name
+                   大学院試勉強
                     </ProjectText>
                 </ProjectDiv>
                 
                 <ColumnDiv>
                     <Column>
-                        <ColumnTitleDiv>
-                            <ColumnTitle>③ Todo</ColumnTitle>
-                            <PlusButtom>+</PlusButtom>
-                            <PlusButtom>・・・</PlusButtom>
-                        </ColumnTitleDiv>
+                     
+                <WorkTitle/>
 
-                        <Todo>
-                            <TodoText>warota</TodoText>
-                            <PlusButtom reverse>・・・</PlusButtom>                            
-                        </Todo>
-                        <Todo>
-                            waroe
-                        </Todo>
-                        <Form>
-                            <FormTextarea action="">
-                                <textarea name="" id="" cols="30" rows="5"></textarea>
-                            </FormTextarea>
-                            <PlusButtom reverse>put</PlusButtom>
-                            <PlusButtom reverse big>cancele</PlusButtom>
-                        </Form>
+                    <TodoList
+                        todos={this.state.todos}   
+                        deleteTodo={this.deleteTodo}
+                    />
+
+                    <Todoform
+                        item={this.state.item}
+                        updateItem={this.updateItem} 
+                        addTodo={this.addTodo}></Todoform>                      
                     </Column>    
                    
                 </ColumnDiv>
